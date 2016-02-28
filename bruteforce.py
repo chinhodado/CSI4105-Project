@@ -36,12 +36,20 @@ def bruteforce(graph):
 
     return min_nodes_to_remove
 
-#graph = nx.complete_graph(7)
-graph = nx.erdos_renyi_graph(8, 0.5)
+# graph = nx.complete_graph(10)
+graph = nx.erdos_renyi_graph(10, 0.5)
+# graph = nx.Graph()
+# graph.add_cycle([0,1,2,3])
+# graph.add_cycle([0,3,4,5])
+plt.figure("Original graph")
+nx.draw_circular(graph, node_size=20)
+
 start_time = time.time()
 to_remove = bruteforce(graph)
 print(to_remove)
 print("--- %s seconds ---" % (time.time() - start_time))
 graph.remove_nodes_from(to_remove)
+
+plt.figure("Processed graph")
 nx.draw_circular(graph, node_size=20)
 plt.show()
