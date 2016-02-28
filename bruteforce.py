@@ -22,9 +22,11 @@ def bruteforce(graph):
     min_nodes_to_remove = set()
 
     for node in nodes_in_cycles:
-        # make a copy of the graph every time like this is probably not a good idea...
-        new_graph = graph.copy()
-        new_graph.remove_node(node)
+        # make an induced subgraph with the current node removed
+        nodes = graph.nodes()
+        nodes.remove(node)
+        new_graph = graph.subgraph(nodes)
+
         nodes_to_remove = bruteforce(new_graph)
 
         if len(nodes_to_remove) < min_num_to_remove:
