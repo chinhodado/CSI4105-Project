@@ -8,7 +8,7 @@ class FeedbackVertexSetAlgorithm(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def get_fbvs(self, graph):
+    def get_fbvs(self, graph) -> set:
         """
         Get a feedback vertex set of the given graph. May or may not be optimal.
         This will return a set of vertex whose removal will make the graph acyclic.
