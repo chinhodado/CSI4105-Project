@@ -29,6 +29,18 @@ algorithms = [[bruteforce, "bruteforce"], [dumb_bruteforce, "dumb_bruteforce"]]
 graph = nx.erdos_renyi_graph(9, 0.5)
 test_algorithms(algorithms, graph)
 
+graph = nx.erdos_renyi_graph(10, 0.7)
+test_algorithms(algorithms, graph)
+
+graph = nx.erdos_renyi_graph(12, 0.3)
+test_algorithms(algorithms, graph)
+
+graph = nx.erdos_renyi_graph(15, 0.8)
+test_algorithms(algorithms, graph)
+
+graph = nx.erdos_renyi_graph(16, 0.8)
+test_algorithms(algorithms, graph)
+
 graph = nx.dense_gnm_random_graph(10, 25)
 test_algorithms(algorithms, graph)
 
