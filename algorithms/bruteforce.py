@@ -7,7 +7,12 @@ from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
 
 class Bruteforce(FeedbackVertexSetAlgorithm):
     """
-    Bruteforce to find the min size feedback vertex set
+    A bruteforce algorithm to find the min size feedback vertex set
+    This algorithm will find all nodes that belong to at least one cycle. For each of those nodes,
+    it recursively run the algorithm on the induced subgraph with the node removed to find the min fbvs
+    
+    WARNING: THERE IS NO GUARANTEE THAT THIS ALGORITHM IS CORRECT!!! E.G. THERE'S NO GUARANTEE THAT THE
+    RETURNED FBVS IS THE MINIMUM ONE!
     """
 
     def get_fbvs(self, graph):
@@ -19,7 +24,6 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
 
         # get the set of nodes that is in at least one cycle
         nodes_in_cycles = set([item for sublist in cycles for item in sublist])
-        # print(nodes_in_cycles)
 
         min_num_to_remove = sys.maxsize
         min_nodes_to_remove = set()
