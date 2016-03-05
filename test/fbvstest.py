@@ -1,6 +1,5 @@
 import networkx as nx
 
-from algorithms.bruteforce import Bruteforce
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
 
 
