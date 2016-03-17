@@ -2,7 +2,7 @@ import sys
 
 import networkx as nx
 
-from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
+from feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
 
 
 class Bruteforce(FeedbackVertexSetAlgorithm):

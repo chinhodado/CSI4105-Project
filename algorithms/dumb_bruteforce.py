@@ -3,7 +3,7 @@ import sys
 import itertools
 import networkx as nx
 
-from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
+from feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
 
 
 class DumbBruteforce(FeedbackVertexSetAlgorithm):
