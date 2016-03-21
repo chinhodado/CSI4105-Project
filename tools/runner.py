@@ -1,13 +1,13 @@
-
 import networkx as nx
 
-from bruteforce import Bruteforce
+from algorithms.bruteforce import Bruteforce
+
 
 def main():
     bf = Bruteforce()
     k = 8
 
-    cg = nx.complete_graph(k+2)
+    cg = nx.complete_graph(k + 2)
     mg = nx.MultiGraph()
     mg.add_nodes_from(cg.nodes())
     mg.add_edges_from(cg.edges())
@@ -18,7 +18,5 @@ def main():
     print("FVS = {} with size {}.".format(fvs, len(fvs)))
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
-
-

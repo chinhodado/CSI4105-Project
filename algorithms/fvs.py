@@ -1,21 +1,20 @@
 import itertools
-import networkx as nx
+
 import networkx.algorithms.components.connected as nxc
 import networkx.algorithms.cycles as cyc
-
-from utils import *
-
-from networkx import MultiGraph
 from networkx.algorithms.tree import is_forest
 
-from bruteforce import Bruteforce
-from dumb_bruteforce import DumbBruteforce
+from algorithms.bruteforce import Bruteforce
+from algorithms.dumb_bruteforce import DumbBruteforce
+from tools.utils import *
+
 
 # Original (unused) code for G - W.
 def graph_minus_slow(g: MultiGraph, w: set) -> MultiGraph:
     gx = g.copy()
     gx.remove_nodes_from(w)
     return gx
+
 
 # Optimised code for G - W (yields an approx 2x speed-up).
 def graph_minus(g: MultiGraph, w: set) -> MultiGraph:
@@ -28,15 +27,18 @@ def graph_minus(g: MultiGraph, w: set) -> MultiGraph:
             gx.add_node(n)
     return gx
 
+
 def is_fvs(g: MultiGraph, w) -> bool:
     h = graph_minus(g, w)
-    return ((len(h) == 0) or is_forest(h))
+    return (len(h) == 0) or is_forest(h)
+
 
 def is_independent_set(g: MultiGraph, f: set) -> bool:
     for edge in itertools.combinations(f, 2):
         if g.has_edge(edge[0], edge[1]):
             return False
     return True
+
 
 # Note: Reduction functions return (k, new, changed) and mutate their graph arguments (G and H)!
 
@@ -48,7 +50,8 @@ def reduction1(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool)
             g.remove_node(v)
             h.remove_nodes_from([v])
             changed = True
-    return (k, None, changed)
+    return k, None, changed
+
 
 # If there exists a vertex v in H such that G[W ∪ {v}]
 # contains a cycle, then include v in the solution, delete v and decrease the
@@ -61,8 +64,9 @@ def reduction2(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool)
         if not is_forest(g.subgraph(w.union({v}))):
             g.remove_node(v)
             h.remove_nodes_from([v])
-            return (k - 1, v, True)
-    return (k, None, False)
+            return k - 1, v, True
+    return k, None, False
+
 
 # If there is a vertex v ∈ V (H) of degree 2 in G such
 # that at least one neighbor of v in G is from V (H), then delete this vertex
@@ -81,8 +85,9 @@ def reduction3(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool)
                 h.remove_nodes_from([v])
                 if n1 not in w and n2 not in w:
                     h.add_edge(n1, n2)
-                return (k, None, True)
-    return (k, None, False)
+                return k, None, True
+    return k, None, False
+
 
 # Exhaustively apply reductions.
 # This function owns G.
@@ -103,7 +108,8 @@ def apply_reductions(g: MultiGraph, w: set, k: int) -> (int, set):
                     x.add(solx)
 
         if not reduction_applied:
-            return (k, x)
+            return k, x
+
 
 # Given a graph G and a FVS W of size at least (k + 1), is it possible to construct
 # a FVS X of size at most k using only the vertices of G - W?
@@ -150,6 +156,7 @@ def fvs_disjoint(g: MultiGraph, w: set, k: int) -> set:
 
     return None
 
+
 # Given a graph G and an FVS Z of size (k + 1), construct an FVS of size at most k.
 # Return `None` if no such solution exists.
 def ic_compression(g: MultiGraph, z: set, k: int) -> MultiGraph:
@@ -161,6 +168,7 @@ def ic_compression(g: MultiGraph, z: set, k: int) -> MultiGraph:
             if x is not None:
                 return x.union(xz)
     return None
+
 
 # Given a graph G and an integer k, construct an FVS of size at most k using
 # the iterative compression based algorithm from Parametrzed Algorithms 4.3.1
@@ -198,6 +206,7 @@ def fvs_via_ic(g: MultiGraph, k: int) -> set:
 
     return soln
 
+
 def compress(g: MultiGraph, t: set, compressed_node, mutate=False) -> MultiGraph:
     if not t:
         return g
@@ -233,6 +242,7 @@ def compress(g: MultiGraph, t: set, compressed_node, mutate=False) -> MultiGraph
 
     return gx
 
+
 def generalized_degree(g: MultiGraph, f: set, active_node, node) -> (int, set):
     assert g.has_node(node), "Calculating gd for node which is not in g!"
 
@@ -245,7 +255,8 @@ def generalized_degree(g: MultiGraph, f: set, active_node, node) -> (int, set):
     neighbors = gx.neighbors(node)
     neighbors.remove(active_node)
 
-    return (len(neighbors), neighbors)
+    return len(neighbors), neighbors
+
 
 def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
     k_set = k != None
@@ -254,10 +265,10 @@ def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
         return None
     if f == g.nodes() or (k_set and k <= 0):
         return f
-    if (not f):
+    if not f:
         g_degree = g.degree()
         g_max_degree_node = max(g_degree, key=lambda n: g_degree[n])
-        if (g_degree[g_max_degree_node] <= 1):
+        if g_degree[g_max_degree_node] <= 1:
             return set(g.nodes())
         else:
             fx = f.copy()
@@ -265,7 +276,7 @@ def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
             gx = g.copy()
             gx.remove_node(g_max_degree_node)
             if k_set:
-                new_k1 = k-1
+                new_k1 = k - 1
                 new_k2 = k
             mif_set1 = mif_preprocess_1(g, fx, t, new_k1)
             mif_set2 = mif_preprocess_1(gx, f, t, new_k2)
@@ -287,7 +298,7 @@ def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
         if gd_v <= 1:
             f.add(v)
             if k_set:
-                new_k1 = k-1
+                new_k1 = k - 1
             return mif_preprocess_1(g, f, t, new_k1)
         elif gd_v >= 3:
             gd_over_3 = v
@@ -300,7 +311,7 @@ def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
         gx = g.copy()
         gx.remove_node(gd_over_3)
         if k_set:
-            new_k1 = k-1
+            new_k1 = k - 1
             new_k2 = k
         mif_set1 = mif_preprocess_1(g, fx, t, new_k1)
         mif_set2 = mif_preprocess_1(gx, f, t, new_k2)
@@ -320,8 +331,8 @@ def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
         gx = g.copy()
         gx.remove_node(v)
         if k_set:
-            new_k1 = k-2
-            new_k2 = k-1
+            new_k1 = k - 2
+            new_k2 = k - 1
         try:
             cyc.find_cycle(gx.subgraph(fx2))
             mif_set1 = None
@@ -335,6 +346,7 @@ def mif_main(g: MultiGraph, f: set, t, k: int) -> set:
         else:
             return max(mif_set1, mif_set2, key=len)
     return None
+
 
 def mif_preprocess_2(g: MultiGraph, f: set, active_v, k: int) -> set:
     mif_set = set()
@@ -361,6 +373,7 @@ def mif_preprocess_2(g: MultiGraph, f: set, active_v, k: int) -> set:
         return mif_set
     return None
 
+
 def mif_preprocess_1(g: MultiGraph, f: set, active_v, k: int) -> set:
     if nxc.number_connected_components(g) >= 2:
         mif_set = set()
@@ -379,6 +392,7 @@ def mif_preprocess_1(g: MultiGraph, f: set, active_v, k: int) -> set:
         return None
     return mif_preprocess_2(g, f, active_v, k)
 
+
 def mif(g: MultiGraph, k=None) -> set:
     mif_set = mif_preprocess_1(g, set(), None, k)
     if k != None and mif_set:
@@ -386,12 +400,14 @@ def mif(g: MultiGraph, k=None) -> set:
             mif_set = None
     return mif_set
 
+
 def fvs_via_mif(g: MultiGraph, k: int) -> set:
-    mif_set = mif(g, g.order()-k)
+    mif_set = mif(g, g.order() - k)
     if mif_set:
         nodes = set(g.nodes())
         mif_set = nodes.difference(mif_set)
     return mif_set
+
 
 def fvs_via_bruteforce(g: MultiGraph, k: int) -> set:
     bf = Bruteforce()
@@ -399,9 +415,9 @@ def fvs_via_bruteforce(g: MultiGraph, k: int) -> set:
     rx = bf.get_fbvs(gx)
     return rx
 
-def fvs_via_dumb_bruteforce(g: MultiGraph, k:int) -> set:
+
+def fvs_via_dumb_bruteforce(g: MultiGraph, k: int) -> set:
     dbf = DumbBruteforce()
     gx = multigraph_to_graph(g)
     rx = dbf.get_fbvs(gx)
     return rx
-

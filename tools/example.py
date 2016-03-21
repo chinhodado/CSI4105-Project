@@ -1,13 +1,11 @@
 # Generate and solve a random instance using the iterative compression algorithm.
 
-import networkx as nx
+from algorithms.fvs import *
+from tools.benchmark import *
+from tools.generate import *
 
-from fvs import *
-from generate import *
-from benchmark import *
 
 def main():
-
     k = 5
     cg = generate_random_graph(k)
     # cg = generate_complete_graph(k)

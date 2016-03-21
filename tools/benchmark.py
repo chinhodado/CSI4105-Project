@@ -3,10 +3,10 @@ import multiprocessing as mp
 
 from multiprocessing import Pool
 
-from fvs import *
-from generate import *
+from networkx import MultiGraph
 
-TEN_MINUTES = 10*60 # seconds
+TEN_MINUTES = 10 * 60  # seconds
+
 
 # Solve the given instance and return the time required to do so.
 def time_instance(g: MultiGraph, k: int, alg, n=1) -> (set, float):
@@ -15,6 +15,7 @@ def time_instance(g: MultiGraph, k: int, alg, n=1) -> (set, float):
         fvs = alg(g, k)
     end = time.process_time()
     return (fvs, (end - start) / n)
+
 
 # Time a list of instances, waiting at most 10m for any single instance.
 # If an instance times out, its result is None.

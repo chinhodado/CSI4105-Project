@@ -2,9 +2,9 @@ import random
 import pickle
 import networkx as nx
 
-from fvs import *
 from random import randint
-from utils import *
+from tools.utils import *
+
 
 # Split an integer into a sum.
 # Not very "fair", but nice and simple.
@@ -15,14 +15,17 @@ def split(k: int) -> list:
     else:
         return [k]
 
+
 # Generate a random FVS instance with a minimum FVS size of k.
 def generate_random_graph(k: int) -> MultiGraph:
     return generate_custom(k, k)
 
+
 # Generate a FVS instance of size k in a complete graph with k+2 nodes.
 def generate_complete_graph(k: int) -> MultiGraph:
-    gx = nx.complete_graph(k+2)
+    gx = nx.complete_graph(k + 2)
     return graph_to_multigraph(gx)
+
 
 def generate_custom(k: int, q: int) -> MultiGraph:
     # Random number of line segments (contribute nothing).
@@ -63,15 +66,18 @@ def generate_custom(k: int, q: int) -> MultiGraph:
 
     return g
 
+
 # Load pickled data from disk.
 def from_disk(filename) -> list:
     with open(filename, "rb") as f:
         return pickle.load(f)
 
+
 # Pickle data to disk.
 def to_disk(data, filename):
     with open(filename, "wb") as f:
         pickle.dump(data, f)
+
 
 # Generate a bunch of graphs.
 def generate_collection(k_min, k_max, q, graphs_per_k):
