@@ -24,7 +24,7 @@ def main():
     print("Computation took {:.3f} seconds.".format(time))
 
     print("\nAlgorithm: iterative compression 2 with k = {}.".format(k))
-    fvs, time = time_instance(cg, k, alg=fvs_via_ic2_dec, n=1)
+    fvs, time = time_instance(cg, k, alg=fvs_via_ic_dec, n=1)
     print("Done!")
     print("FVS = {} with size {}.".format(fvs, len(fvs)))
     print("Computation took {:.3f} seconds.".format(time))

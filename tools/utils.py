@@ -1,5 +1,7 @@
+import itertools
 from networkx import Graph
 from networkx import MultiGraph
+from networkx.algorithms.tree import is_forest
 
 
 def multigraph_to_graph(g: MultiGraph) -> Graph:
@@ -13,3 +15,34 @@ def multigraph_to_graph(g: MultiGraph) -> Graph:
 def graph_to_multigraph(g: Graph) -> MultiGraph:
     gx = MultiGraph(g)
     return gx
+
+
+# Original (unused) code for G - W.
+def graph_minus_slow(g: MultiGraph, w: set) -> MultiGraph:
+    gx = g.copy()
+    gx.remove_nodes_from(w)
+    return gx
+
+
+# Optimised code for G - W (yields an approx 2x speed-up).
+def graph_minus(g: MultiGraph, w: set) -> MultiGraph:
+    gx = MultiGraph()
+    for (n1, n2) in g.edges():
+        if n1 not in w and n2 not in w:
+            gx.add_edge(n1, n2)
+    for n in g.nodes():
+        if n not in w:
+            gx.add_node(n)
+    return gx
+
+
+def is_fvs(g: MultiGraph, w) -> bool:
+    h = graph_minus(g, w)
+    return (len(h) == 0) or is_forest(h)
+
+
+def is_independent_set(g: MultiGraph, f: set) -> bool:
+    for edge in itertools.combinations(f, 2):
+        if g.has_edge(edge[0], edge[1]):
+            return False
+    return True
