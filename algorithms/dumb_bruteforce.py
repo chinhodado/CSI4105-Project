@@ -1,5 +1,3 @@
-import sys
-
 import itertools
 import networkx as nx
 
@@ -30,3 +28,6 @@ class DumbBruteforce(FeedbackVertexSetAlgorithm):
                     return subset
 
         return set()
+
+    def get_fbvs_max_size(self, graph, k) -> set:
+        raise Exception("Undefined for this algorithm")

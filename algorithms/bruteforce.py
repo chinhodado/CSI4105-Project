@@ -63,3 +63,6 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
                 min_nodes_to_remove = nodes_to_remove
 
         return min_nodes_to_remove
+
+    def get_fbvs_max_size(self, graph, k) -> set:
+        raise Exception("Undefined for this algorithm")
