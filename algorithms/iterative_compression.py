@@ -4,11 +4,12 @@ from networkx import MultiGraph
 from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
+from tools.utils import graph_minus
 
 
 class IterativeCompression(FeedbackVertexSetAlgorithm):
     """
-    Iterative compression
+    Iterative compression from Parametrzed Algorithms 4.3.1
     """
 
     def get_fbvs(self, graph):
@@ -17,8 +18,6 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
             if result is not None:
                 return result  # in the worst case, result is the whole set of vertices
 
-    # Given a graph G and an integer k, construct an FVS of size at most k using
-    # the iterative compression based algorithm from Parametrzed Algorithms 4.3.1
     def get_fbvs_max_size(self, g: MultiGraph, k: int) -> set:
         if len(g) <= k + 2:
             return set(g.nodes()[:k])
@@ -55,9 +54,16 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
 
     # Note: Reduction functions return (k, new, changed) and mutate their graph arguments (G and H)!
 
-    # Delete all vertices of degree 0 or 1 (as they can't be part of any cycles).
     @staticmethod
     def reduction1(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
+        """
+        Delete all vertices of degree 0 or 1 (as they can't be part of any cycles).
+        :param g:
+        :param w:
+        :param h:
+        :param k:
+        :return:
+        """
         changed = False
         for v in g.nodes():
             if g.degree(v) <= 1:
@@ -66,13 +72,20 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
                 changed = True
         return k, None, changed
 
-    # If there exists a vertex v in H such that G[W ∪ {v}]
-    # contains a cycle, then include v in the solution, delete v and decrease the
-    # parameter by 1. That is, the new instance is (G - {v}, W, k - 1).
-    # If v introduces a cycle, it must be part of X as none of the vertices in W
-    # will be available to neutralise this cycle.
     @staticmethod
     def reduction2(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
+        """
+        If there exists a vertex v in H such that G[W ∪ {v}]
+        contains a cycle, then include v in the solution, delete v and decrease the
+        parameter by 1. That is, the new instance is (G - {v}, W, k - 1).
+        If v introduces a cycle, it must be part of X as none of the vertices in W
+        will be available to neutralise this cycle.
+        :param g:
+        :param w:
+        :param h:
+        :param k:
+        :return:
+        """
         for v in h.nodes():
             # Check if G[W ∪ {v}] contains a cycle.
             if not is_forest(g.subgraph(w.union({v}))):
@@ -81,12 +94,19 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
                 return k - 1, v, True
         return k, None, False
 
-    # If there is a vertex v ∈ V (H) of degree 2 in G such
-    # that at least one neighbor of v in G is from V (H), then delete this vertex
-    # and make its neighbors adjacent (even if they were adjacent before; the graph
-    # could become a multigraph now).
     @staticmethod
     def reduction3(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
+        """
+        If there is a vertex v ∈ V (H) of degree 2 in G such
+        that at least one neighbor of v in G is from V (H), then delete this vertex
+        and make its neighbors adjacent (even if they were adjacent before; the graph
+        could become a multigraph now).
+        :param g:
+        :param w:
+        :param h:
+        :param k:
+        :return:
+        """
         for v in h.nodes():
             if g.degree(v) == 2:
                 # If v has a neighbour in H, short-curcuit it.
@@ -102,12 +122,18 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
                     return k, None, True
         return k, None, False
 
-    # Exhaustively apply reductions.
-    # This function owns G.
     @staticmethod
     def apply_reductions(g: MultiGraph, w: set, k: int) -> (int, set):
+        """
+        Exhaustively apply reductions.
+        This function owns G.
+        :param g:
+        :param w:
+        :param k:
+        :return:
+        """
         # Current H.
-        h = IterativeCompression.graph_minus(g, w)
+        h = graph_minus(g, w)
 
         # Set of vertices included in the solution as a result of reductions.
         x = set()
@@ -125,11 +151,17 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
             if not reduction_applied:
                 return k, x
 
-    # Given a graph G and a FVS W of size at least (k + 1), is it possible to construct
-    # a FVS X of size at most k using only the vertices of G - W?
-    # This function owns G and can mutate it freely.
     @staticmethod
     def fvs_disjoint(g: MultiGraph, w: set, k: int) -> set:
+        """
+        Given a graph G and a FVS W of size at least (k + 1), is it possible to construct
+        a FVS X of size at most k using only the vertices of G - W?
+        This function owns G and can mutate it freely.
+        :param g:
+        :param w:
+        :param k:
+        :return:
+        """
         # Check that G[W] is a forest.
         # If it isn't, then a solution X not using W can't remove W's cycles.
         if not is_forest(g.subgraph(w)):
@@ -149,7 +181,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
             return soln_redux
 
         # Find an x in H of degree at most 1.
-        h = IterativeCompression.graph_minus(g, w)
+        h = graph_minus(g, w)
         x = None
         for v in h.nodes():
             if h.degree(v) <= 1:
@@ -159,7 +191,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
 
         # Branch.
         # G is copied in the left branch (as it is modified), but passed directly in the right.
-        soln_left = IterativeCompression.fvs_disjoint(IterativeCompression.graph_minus(g, {x}), w, k - 1)
+        soln_left = IterativeCompression.fvs_disjoint(graph_minus(g, {x}), w, k - 1)
 
         if soln_left is not None:
             return soln_redux.union(soln_left).union({x})
@@ -171,27 +203,21 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
 
         return None
 
-    # Given a graph G and an FVS Z of size (k + 1), construct an FVS of size at most k.
-    # Return `None` if no such solution exists.
     @staticmethod
     def ic_compression(g: MultiGraph, z: set, k: int) -> MultiGraph:
+        """
+        Given a graph G and an FVS Z of size (k + 1), construct an FVS of size at most k.
+        Return `None` if no such solution exists.
+        :param g:
+        :param z:
+        :param k:
+        :return:
+        """
         assert (len(z) == k + 1)
         # i in {0 .. k}
         for i in range(0, k + 1):
             for xz in itertools.combinations(z, i):
-                x = IterativeCompression.fvs_disjoint(IterativeCompression.graph_minus(g, xz), z.difference(xz), k - i)
+                x = IterativeCompression.fvs_disjoint(graph_minus(g, xz), z.difference(xz), k - i)
                 if x is not None:
                     return x.union(xz)
         return None
-
-    # Optimised code for G - W (yields an approx 2x speed-up).
-    @staticmethod
-    def graph_minus(g: MultiGraph, w: set) -> MultiGraph:
-        gx = MultiGraph()
-        for (n1, n2) in g.edges():
-            if n1 not in w and n2 not in w:
-                gx.add_edge(n1, n2)
-        for n in g.nodes():
-            if n not in w:
-                gx.add_node(n)
-        return gx
