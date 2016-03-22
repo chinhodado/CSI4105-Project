@@ -21,6 +21,15 @@ class FbvsTest:
         assert len(fbvs) == 1
         print(" [Passed]")
 
+        # a graph with 2 cycles that can be broken by removing 1 node (node 0)
+        print("Testing a custom graph", end="")
+        graph = nx.Graph()
+        graph.add_nodes_from(range(1, 16))
+        graph.add_cycle([10,11,12])
+        fbvs = self.algorithm.get_fbvs(graph)
+        assert len(fbvs) == 1
+        print(" [Passed]")
+
         print("Testing a complete graph", end="")
         graph = nx.complete_graph(5)
         fbvs = self.algorithm.get_fbvs(graph)
