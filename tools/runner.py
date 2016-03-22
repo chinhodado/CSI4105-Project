@@ -1,10 +1,10 @@
 import networkx as nx
 
-from algorithms.bruteforce import Bruteforce
+from algorithms.bruteforce_cycle import BruteforceCycle
 
 
 def main():
-    bf = Bruteforce()
+    bf = BruteforceCycle()
     k = 8
 
     cg = nx.complete_graph(k + 2)

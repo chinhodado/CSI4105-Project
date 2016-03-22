@@ -4,8 +4,8 @@ import networkx.algorithms.components.connected as nxc
 import networkx.algorithms.cycles as cyc
 from networkx.algorithms.tree import is_forest
 
+from algorithms.bruteforce_cycle import BruteforceCycle
 from algorithms.bruteforce import Bruteforce
-from algorithms.dumb_bruteforce import DumbBruteforce
 from algorithms.iterative_compression import IterativeCompression
 from tools.utils import *
 
@@ -244,14 +244,14 @@ def fvs_via_mif(g: MultiGraph, k: int) -> set:
 
 
 def fvs_via_bruteforce(g: MultiGraph, k: int) -> set:
-    bf = Bruteforce()
+    bf = BruteforceCycle()
     gx = multigraph_to_graph(g)
     rx = bf.get_fbvs(gx)
     return rx
 
 
 def fvs_via_dumb_bruteforce(g: MultiGraph, k: int) -> set:
-    dbf = DumbBruteforce()
+    dbf = Bruteforce()
     gx = multigraph_to_graph(g)
     rx = dbf.get_fbvs(gx)
     return rx

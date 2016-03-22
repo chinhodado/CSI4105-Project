@@ -1,7 +1,7 @@
 import time
 
+from algorithms.bruteforce_cycle import BruteforceCycle
 from algorithms.bruteforce import Bruteforce
-from algorithms.dumb_bruteforce import DumbBruteforce
 import networkx as nx
 
 """
@@ -21,8 +21,8 @@ def test_algorithms(algorithms, graph):
     assert results.count(results[0]) == len(results), "The algorithms's results are not the same!"
 
 
-bruteforce = Bruteforce()
-dumb_bruteforce = DumbBruteforce()
+bruteforce = BruteforceCycle()
+dumb_bruteforce = Bruteforce()
 
 algorithms = [[bruteforce, "bruteforce"], [dumb_bruteforce, "dumb_bruteforce"]]
 
