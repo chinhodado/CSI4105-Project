@@ -1,15 +1,17 @@
 import time
 
-from algorithms.bruteforce_cycle import BruteforceCycle
-from algorithms.bruteforce import Bruteforce
 import networkx as nx
+
+from algorithms.bruteforce import Bruteforce
+from algorithms.bruteforce_cycle import BruteforceCycle
+from algorithms.iterative_compression import IterativeCompression
 
 """
 Use some randomly-generated graphs to make sure the algorithms return the same value
 """
 
 
-def test_algorithms(algorithms, graph):
+def test_algorithms(algorithms, graph: nx.Graph):
     print()
     print("Testing graph with {0} nodes and {1} edges".format(graph.number_of_nodes(), graph.number_of_edges()))
     results = []
@@ -21,10 +23,11 @@ def test_algorithms(algorithms, graph):
     assert results.count(results[0]) == len(results), "The algorithms's results are not the same!"
 
 
-bruteforce = BruteforceCycle()
-dumb_bruteforce = Bruteforce()
+bruteforce_cycle = BruteforceCycle()
+bruteforce = Bruteforce()
+ic = IterativeCompression()
 
-algorithms = [[bruteforce, "bruteforce"], [dumb_bruteforce, "dumb_bruteforce"]]
+algorithms = [[bruteforce_cycle, "bruteforce_cycle"], [bruteforce, "bruteforce"], [ic, "itertive_compression"]]
 
 graph = nx.erdos_renyi_graph(9, 0.5)
 test_algorithms(algorithms, graph)
@@ -32,7 +35,13 @@ test_algorithms(algorithms, graph)
 graph = nx.erdos_renyi_graph(10, 0.7)
 test_algorithms(algorithms, graph)
 
+graph = nx.erdos_renyi_graph(11, 0.6)
+test_algorithms(algorithms, graph)
+
 graph = nx.erdos_renyi_graph(12, 0.3)
+test_algorithms(algorithms, graph)
+
+graph = nx.erdos_renyi_graph(13, 0.5)
 test_algorithms(algorithms, graph)
 
 graph = nx.erdos_renyi_graph(15, 0.8)
