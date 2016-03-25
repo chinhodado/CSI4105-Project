@@ -1,6 +1,6 @@
 import itertools
 
-from networkx import MultiGraph
+from networkx import MultiGraph, Graph
 from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
@@ -12,8 +12,8 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     Iterative compression from Parametrzed Algorithms 4.3.1
     """
 
-    def get_fbvs(self, graph):
-        for i in range(1, graph.number_of_nodes()):
+    def get_fbvs(self, graph: Graph):
+        for i in range(0, graph.number_of_nodes()):
             result = self.get_fbvs_max_size(graph, i)
             if result is not None:
                 return result  # in the worst case, result is the whole set of vertices
