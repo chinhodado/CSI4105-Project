@@ -1,7 +1,9 @@
 import itertools
+
 import networkx as nx
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
+from tools.utils import remove_node_deg_01
 
 
 class Bruteforce(FeedbackVertexSetAlgorithm):
@@ -14,6 +16,9 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
     """
 
     def get_fbvs(self, graph):
+        # remove all nodes of degree 0 or 1 as they can't be part of any cycles
+        remove_node_deg_01(graph)
+
         nodes = graph.nodes()
         for L in range(0, len(nodes) + 1):
             for subset in itertools.combinations(nodes, L):

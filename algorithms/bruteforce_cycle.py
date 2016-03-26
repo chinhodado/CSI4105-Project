@@ -3,6 +3,7 @@ import sys
 import networkx as nx
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
+from tools.utils import remove_node_deg_01
 
 
 class BruteforceCycle(FeedbackVertexSetAlgorithm):
@@ -21,6 +22,9 @@ class BruteforceCycle(FeedbackVertexSetAlgorithm):
         self.cacheDict = {}
 
     def get_fbvs(self, graph):
+        # remove all nodes of degree 0 or 1 as they can't be part of any cycles
+        remove_node_deg_01(graph)
+
         # reset the cache dict
         self.cacheDict = {}
         return self._get_fbvs(graph)

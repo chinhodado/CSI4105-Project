@@ -46,3 +46,15 @@ def is_independent_set(g: MultiGraph, f: set) -> bool:
         if g.has_edge(edge[0], edge[1]):
             return False
     return True
+
+
+def remove_node_deg_01(g: MultiGraph) -> bool:
+    """
+    Delete all vertices of degree 0 or 1 in a graph
+    """
+    changed = False
+    for v in g.nodes():
+        if g.degree(v) <= 1:
+            g.remove_node(v)
+            changed = True
+    return changed
