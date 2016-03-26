@@ -1,6 +1,6 @@
 import sys
 
-import networkx as nx
+from networkx import Graph, cycle_basis
 from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
@@ -22,7 +22,7 @@ class BruteforceCycle(FeedbackVertexSetAlgorithm):
         # the key is a frozenset of nodes, and the value is the min fvbs of the subgraph induced on that set of nodes
         self.cacheDict = {}
 
-    def get_fbvs(self, graph):
+    def get_fbvs(self, graph: Graph):
         if is_forest(graph):
             return set()
 
@@ -35,7 +35,7 @@ class BruteforceCycle(FeedbackVertexSetAlgorithm):
 
     def _get_fbvs(self, graph):
         # get the list of cycles
-        cycles = nx.cycle_basis(graph)
+        cycles = cycle_basis(graph)
 
         # if the graph is already acyclic, there's nothing to remove, so return an empty set
         if len(cycles) == 0:

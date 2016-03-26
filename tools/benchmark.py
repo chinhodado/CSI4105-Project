@@ -8,8 +8,10 @@ from networkx import MultiGraph
 TEN_MINUTES = 10 * 60  # seconds
 
 
-# Solve the given instance and return the time required to do so.
 def time_instance(g: MultiGraph, k: int, alg, n=1) -> (set, float):
+    """
+    Solve the given instance and return the time required to do so.
+    """
     start = time.process_time()
     for _ in range(0, n):
         fvs = alg(g, k)
@@ -17,11 +19,14 @@ def time_instance(g: MultiGraph, k: int, alg, n=1) -> (set, float):
     return (fvs, (end - start) / n)
 
 
-# Time a list of instances, waiting at most 10m for any single instance.
-# If an instance times out, its result is None.
-# graphs: [(MultiGraph, int)]
-# returns: [(fvs, time in seconds)]
 def time_all(graphs, alg) -> list:
+    """
+    Time a list of instances, waiting at most 10m for any single instance.
+    If an instance times out, its result is `None`.
+
+    :param graphs: [(MultiGraph, int)]
+    :returns: [(fvs, time in seconds)]
+    """
     with Pool(1) as p:
         results = []
         for (g, k) in graphs:

@@ -17,7 +17,7 @@ def graph_to_multigraph(g: Graph) -> MultiGraph:
     return gx
 
 
-def graph_minus(g: MultiGraph, s: set) -> MultiGraph:
+def graph_minus(g: Graph, s: set) -> Graph:
     new_nodes = [x for x in g.nodes() if x not in s]
     new_graph = g.subgraph(new_nodes)
     return new_graph
@@ -35,7 +35,7 @@ def is_independent_set(g: MultiGraph, f: set) -> bool:
     return True
 
 
-def remove_node_deg_01(g: MultiGraph) -> bool:
+def remove_node_deg_01(g: Graph) -> bool:
     """
     Delete all nodes of degree 0 or 1 in a graph
     Return `True` if the graph was modified and `False` otherwise

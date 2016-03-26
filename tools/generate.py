@@ -6,9 +6,11 @@ from random import randint
 from tools.utils import *
 
 
-# Split an integer into a sum.
-# Not very "fair", but nice and simple.
 def split(k: int) -> list:
+    """
+    Split an integer into a sum.
+    Not very "fair", but nice and simple.
+    """
     n = randint(1, k)
     if n < k:
         return [n] + split(k - n)
@@ -16,13 +18,17 @@ def split(k: int) -> list:
         return [k]
 
 
-# Generate a random FVS instance with a minimum FVS size of k.
 def generate_random_graph(k: int) -> MultiGraph:
+    """
+    Generate a random FVS instance with a minimum FVS size of k.
+    """
     return generate_custom(k, k)
 
 
-# Generate a FVS instance of size k in a complete graph with k+2 nodes.
 def generate_complete_graph(k: int) -> MultiGraph:
+    """
+    Generate a FVS instance of size k in a complete graph with k+2 nodes.
+    """
     gx = nx.complete_graph(k + 2)
     return graph_to_multigraph(gx)
 
@@ -67,18 +73,24 @@ def generate_custom(k: int, q: int) -> MultiGraph:
     return g
 
 
-# Load pickled data from disk.
 def from_disk(filename) -> list:
+    """
+    Load pickled data from disk.
+    """
     with open(filename, "rb") as f:
         return pickle.load(f)
 
 
-# Pickle data to disk.
 def to_disk(data, filename):
+    """
+    Pickle data to disk.
+    """
     with open(filename, "wb") as f:
         pickle.dump(data, f)
 
 
-# Generate a bunch of graphs.
 def generate_collection(k_min, k_max, q, graphs_per_k):
+    """
+    Generate a bunch of graphs.
+    """
     return [(generate_custom(k, q), k) for k in range(k_min, k_max) for _ in range(graphs_per_k)]

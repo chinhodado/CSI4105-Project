@@ -12,7 +12,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     Iterative compression from Parametrzed Algorithms 4.3.1
     """
 
-    def get_fbvs(self, graph: Graph):
+    def get_fbvs(self, graph: MultiGraph):
         for i in range(0, graph.number_of_nodes()):
             result = self.get_fbvs_max_size(graph, i)
             if result is not None:

@@ -1,5 +1,6 @@
 import itertools
 
+from networkx import Graph
 from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
@@ -15,7 +16,7 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
     This takes no consideration whether a node is in a cycle or not
     """
 
-    def get_fbvs(self, graph):
+    def get_fbvs(self, graph: Graph):
         if is_forest(graph):
             return set()
 
