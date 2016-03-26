@@ -3,7 +3,7 @@ import itertools
 from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
-from tools.utils import remove_node_deg_01
+from tools.utils import remove_node_deg_01, graph_minus
 
 
 class Bruteforce(FeedbackVertexSetAlgorithm):
@@ -25,9 +25,8 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
         nodes = graph.nodes()
         for L in range(0, len(nodes) + 1):
             for subset in itertools.combinations(nodes, L):
-                # make an induced subgraph with the current node removed
-                new_nodes = [x for x in graph.nodes() if x not in subset]
-                new_graph = graph.subgraph(new_nodes)
+                # make an induced subgraph with the current node subset removed
+                new_graph = graph_minus(graph, subset)
 
                 if is_forest(new_graph):
                     return subset

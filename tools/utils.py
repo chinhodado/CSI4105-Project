@@ -17,16 +17,10 @@ def graph_to_multigraph(g: Graph) -> MultiGraph:
     return gx
 
 
-# Optimised code for G - W (yields an approx 2x speed-up).
-def graph_minus(g: MultiGraph, w: set) -> MultiGraph:
-    gx = MultiGraph()
-    for (n1, n2) in g.edges():
-        if n1 not in w and n2 not in w:
-            gx.add_edge(n1, n2)
-    for n in g.nodes():
-        if n not in w:
-            gx.add_node(n)
-    return gx
+def graph_minus(g: MultiGraph, s: set) -> MultiGraph:
+    new_nodes = [x for x in g.nodes() if x not in s]
+    new_graph = g.subgraph(new_nodes)
+    return new_graph
 
 
 def is_fvs(g: MultiGraph, w) -> bool:
