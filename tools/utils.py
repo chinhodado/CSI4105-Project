@@ -17,13 +17,6 @@ def graph_to_multigraph(g: Graph) -> MultiGraph:
     return gx
 
 
-# Original (unused) code for G - W.
-def graph_minus_slow(g: MultiGraph, w: set) -> MultiGraph:
-    gx = g.copy()
-    gx.remove_nodes_from(w)
-    return gx
-
-
 # Optimised code for G - W (yields an approx 2x speed-up).
 def graph_minus(g: MultiGraph, w: set) -> MultiGraph:
     gx = MultiGraph()
@@ -50,7 +43,8 @@ def is_independent_set(g: MultiGraph, f: set) -> bool:
 
 def remove_node_deg_01(g: MultiGraph) -> bool:
     """
-    Delete all vertices of degree 0 or 1 in a graph
+    Delete all nodes of degree 0 or 1 in a graph
+    Return `True` if the graph was modified and `False` otherwise
     """
     changed = False
     for v in g.nodes():

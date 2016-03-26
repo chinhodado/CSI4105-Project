@@ -52,17 +52,10 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
 
         return soln
 
-    # Note: Reduction functions return (k, new, changed) and mutate their graph arguments (G and H)!
-
     @staticmethod
     def reduction1(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
         """
-        Delete all vertices of degree 0 or 1 (as they can't be part of any cycles).
-        :param g:
-        :param w:
-        :param h:
-        :param k:
-        :return:
+        Delete all nodes of degree 0 or 1 as they can't be part of any cycles.
         """
         changed = False
         for v in g.nodes():
@@ -75,16 +68,11 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     @staticmethod
     def reduction2(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
         """
-        If there exists a vertex v in H such that G[W ∪ {v}]
+        If there exists a node v in H such that G[W ∪ {v}]
         contains a cycle, then include v in the solution, delete v and decrease the
         parameter by 1. That is, the new instance is (G - {v}, W, k - 1).
         If v introduces a cycle, it must be part of X as none of the vertices in W
         will be available to neutralise this cycle.
-        :param g:
-        :param w:
-        :param h:
-        :param k:
-        :return:
         """
         for v in h.nodes():
             # Check if G[W ∪ {v}] contains a cycle.
@@ -97,15 +85,10 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     @staticmethod
     def reduction3(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
         """
-        If there is a vertex v ∈ V (H) of degree 2 in G such
-        that at least one neighbor of v in G is from V (H), then delete this vertex
+        If there is a node v ∈ V (H) of degree 2 in G such
+        that at least one neighbor of v in G is from V (H), then delete this node
         and make its neighbors adjacent (even if they were adjacent before; the graph
         could become a multigraph now).
-        :param g:
-        :param w:
-        :param h:
-        :param k:
-        :return:
         """
         for v in h.nodes():
             if g.degree(v) == 2:
@@ -126,16 +109,11 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     def apply_reductions(g: MultiGraph, w: set, k: int) -> (int, set):
         """
         Exhaustively apply reductions.
-        This function owns G.
-        :param g:
-        :param w:
-        :param k:
-        :return:
         """
         # Current H.
         h = graph_minus(g, w)
 
-        # Set of vertices included in the solution as a result of reductions.
+        # Set of nodes included in the solution as a result of reductions.
         x = set()
         while True:
             reduction_applied = False
@@ -155,12 +133,8 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     def fvs_disjoint(g: MultiGraph, w: set, k: int) -> set:
         """
         Given a graph G and a FVS W of size at least (k + 1), is it possible to construct
-        a FVS X of size at most k using only the vertices of G - W?
+        a FVS X of size at most k using only the nodes of G - W?
         This function owns G and can mutate it freely.
-        :param g:
-        :param w:
-        :param k:
-        :return:
         """
         # Check that G[W] is a forest.
         # If it isn't, then a solution X not using W can't remove W's cycles.
@@ -171,7 +145,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
         k, soln_redux = IterativeCompression.apply_reductions(g, w, k)
 
         # If k becomes negative, it indicates that the reductions included
-        # more than k vertices, hence no solution of size <= k exists.
+        # more than k nodes, hence no solution of size <= k exists.
         if k < 0:
             return None
 
@@ -208,10 +182,6 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
         """
         Given a graph G and an FVS Z of size (k + 1), construct an FVS of size at most k.
         Return `None` if no such solution exists.
-        :param g:
-        :param z:
-        :param k:
-        :return:
         """
         assert (len(z) == k + 1)
         # i in {0 .. k}
