@@ -1,6 +1,5 @@
 import itertools
 
-import networkx as nx
 from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
@@ -30,10 +29,7 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
                 new_nodes = [x for x in graph.nodes() if x not in subset]
                 new_graph = graph.subgraph(new_nodes)
 
-                # get the list of cycles
-                cycles = nx.cycle_basis(new_graph)
-
-                if len(cycles) == 0:
+                if is_forest(new_graph):
                     return subset
 
         return set()
