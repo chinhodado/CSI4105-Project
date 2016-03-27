@@ -33,7 +33,7 @@ class BruteforceCycle(FeedbackVertexSetAlgorithm):
         self.cacheDict = {}
         return self._get_fbvs(graph)
 
-    def _get_fbvs(self, graph):
+    def _get_fbvs(self, graph: Graph):
         # get the list of cycles
         cycles = cycle_basis(graph)
 
@@ -72,5 +72,5 @@ class BruteforceCycle(FeedbackVertexSetAlgorithm):
 
         return min_nodes_to_remove
 
-    def get_fbvs_max_size(self, graph, k) -> set:
+    def get_fbvs_max_size(self, graph: Graph, k: int) -> set:
         raise Exception("Undefined for this algorithm")

@@ -16,10 +16,6 @@ def test_algorithms(algorithms, graph: nx.Graph):
     print("Testing graph with {0} nodes and {1} edges".format(graph.number_of_nodes(), graph.number_of_edges()))
     results = []
     for algorithm, name in algorithms:
-        # convert to multigraph if needed
-        if type(algorithm) is IterativeCompression:
-            graph = nx.MultiGraph(graph)
-
         start_time = time.time()
         result = len(algorithm.get_fbvs(graph))
         print("{0}: {1}, time: {2}".format(name, result, time.time() - start_time))

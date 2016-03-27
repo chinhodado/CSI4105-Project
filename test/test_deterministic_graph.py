@@ -12,10 +12,6 @@ Test the algorithms using deterministic/pre-defined graphs with already known so
 
 def test_algorithms(algorithms, graph, expected: int):
     for algorithm, name in algorithms:
-        # convert to multigraph if needed
-        if type(algorithm) is IterativeCompression:
-           graph = nx.MultiGraph(graph)
-
         start_time = time.time()
         result = len(algorithm.get_fbvs(graph))
         print("{0}: {1}, time: {2}".format(name, result, time.time() - start_time))

@@ -34,5 +34,5 @@ class Bruteforce(FeedbackVertexSetAlgorithm):
 
         return set()
 
-    def get_fbvs_max_size(self, graph, k) -> set:
+    def get_fbvs_max_size(self, graph: Graph, k: int) -> set:
         raise Exception("Undefined for this algorithm")
