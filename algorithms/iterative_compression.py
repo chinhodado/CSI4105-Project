@@ -45,7 +45,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
             assert (len(soln) == (k + 1))
             assert (len(node_set) == (i + 1))
 
-            new_soln = IterativeCompression.ic_compression(g.subgraph(node_set), soln, k)
+            new_soln = self.ic_compression(g.subgraph(node_set), soln, k)
 
             if new_soln is None:
                 return None
@@ -55,8 +55,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
 
         return soln
 
-    @staticmethod
-    def fvs_disjoint(g: MultiGraph, w: set, k: int) -> set:
+    def fvs_disjoint(self, g: MultiGraph, w: set, k: int) -> set:
         """
         Given an undirected graph G and a fbvs W in G of size at least (k + 1), is it possible to construct
         a fbvs X of size at most k using only the nodes of G - W?
@@ -69,7 +68,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
             return None
 
         # Apply reductions exhaustively.
-        k, soln_redux = IterativeCompression.apply_reductions(g, w, k)
+        k, soln_redux = self.apply_reductions(g, w, k)
 
         # If k becomes negative, it indicates that the reductions included
         # more than k nodes. In other word, reduction 2 shows that there are more than k nodes
@@ -96,20 +95,19 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
 
         # Branch on (G - {x}, W, k−1) and (G, W ∪ {x}, k)
         # G is copied in the left branch (as it is modified), but passed directly in the right.
-        soln_left = IterativeCompression.fvs_disjoint(graph_minus(g, {x}), w, k - 1)
+        soln_left = self.fvs_disjoint(graph_minus(g, {x}), w, k - 1)
 
         if soln_left is not None:
             return soln_redux.union(soln_left).union({x})
 
-        soln_right = IterativeCompression.fvs_disjoint(g, w.union({x}), k)
+        soln_right = self.fvs_disjoint(g, w.union({x}), k)
 
         if soln_right is not None:
             return soln_redux.union(soln_right)
 
         return None
 
-    @staticmethod
-    def ic_compression(g: MultiGraph, z: set, k: int) -> MultiGraph:
+    def ic_compression(self, g: MultiGraph, z: set, k: int) -> MultiGraph:
         """
         Given a graph G and an FVS Z of size (k + 1), construct an FVS of size at most k.
         Return `None` if no such solution exists.
@@ -118,13 +116,12 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
         # i in {0 .. k}
         for i in range(0, k + 1):
             for xz in itertools.combinations(z, i):
-                x = IterativeCompression.fvs_disjoint(graph_minus(g, xz), z.difference(xz), k - i)
+                x = self.fvs_disjoint(graph_minus(g, xz), z.difference(xz), k - i)
                 if x is not None:
                     return x.union(xz)
         return None
 
-    @staticmethod
-    def reduction1(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
+    def reduction1(self, g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
         """
         Delete all nodes of degree 0 or 1 as they can't be part of any cycles.
         """
@@ -136,8 +133,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
                 changed = True
         return k, None, changed
 
-    @staticmethod
-    def reduction2(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
+    def reduction2(self, g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
         """
         If there exists a node v in H such that G[W ∪ {v}]
         contains a cycle, then include v in the solution, delete v and decrease the
@@ -154,8 +150,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
                 return k - 1, v, True
         return k, None, False
 
-    @staticmethod
-    def reduction3(g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
+    def reduction3(self, g: MultiGraph, w: set, h: MultiGraph, k: int) -> (int, int, bool):
         """
         If there is a node v ∈ V(H) of degree 2 in G such
         that at least one neighbor of v in G is from V (H), then delete this node
@@ -177,8 +172,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
                     return k, None, True
         return k, None, False
 
-    @staticmethod
-    def apply_reductions(g: MultiGraph, w: set, k: int) -> (int, set):
+    def apply_reductions(self, g: MultiGraph, w: set, k: int) -> (int, set):
         """
         Exhaustively apply reductions. The three reductions are:
 
@@ -200,8 +194,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
         x = set()
         while True:
             reduction_applied = False
-            for f in [IterativeCompression.reduction1, IterativeCompression.reduction2,
-                      IterativeCompression.reduction3]:
+            for f in [self.reduction1, self.reduction2, self.reduction3]:
                 (k, solx, changed) = f(g, w, h, k)
 
                 if changed:
