@@ -1,5 +1,4 @@
-import networkx.algorithms.components.connected as nxc
-import networkx.algorithms.cycles as cyc
+from networkx import number_connected_components, connected_components, find_cycle
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
 from tools.utils import *
@@ -7,71 +6,71 @@ from tools.utils import *
 
 class MaximumInducedForest(FeedbackVertexSetAlgorithm):
     """
-    Maximum Induced Forest
+    Maximum Induced Forest algorithm for the undirected feedback vertex set problem from chapter 6.2 of
+    Exact Exponential Algorithms by Fomin, Fedor V., Kratsch, Dieter
+
+    Instead of computing a minimum feedback vertex set directly, this algorithm finds the maximum size
+    of an induced forest in a graph. In fact, it solves a more general problem: for any
+    acyclic set F it finds the maximum size of an induced forest containing F.
     """
 
     def get_fbvs(self, graph: Graph):
-        ori_graph = graph.copy()
+        if is_forest(graph):
+            return set()
+
+        # Save the original node set for later use since we'll mutate the graph
+        nodes = set(graph.nodes())
 
         if type(graph) is not MultiGraph:
             graph = MultiGraph(graph)
 
-        mif_set = MaximumInducedForest.mif(graph)
+        mif_set = self.preprocess_1(graph, set(), None)
         if mif_set is not None:
-            nodes = set(ori_graph.nodes())
             fbvs = nodes.difference(mif_set)
             return fbvs
 
         return None
 
-    def get_fbvs_max_size(self, graph, k) -> set:
-        pass
+    def get_fbvs_max_size(self, graph: Graph, k: int) -> set:
+        raise Exception("Undefined for this algorithm")
 
-    @staticmethod
-    def mif(g: MultiGraph) -> set:
-        mif_set = MaximumInducedForest.mif_preprocess_1(g, set(), None)
-        return mif_set
-
-    @staticmethod
-    def mif_preprocess_1(g: MultiGraph, f: set, active_v) -> set:
-        if nxc.number_connected_components(g) >= 2:
+    def preprocess_1(self, g: MultiGraph, f: set, active_v) -> set:
+        if number_connected_components(g) >= 2:
             mif_set = set()
-            for component in nxc.connected_components(g):
+            for component in connected_components(g):
                 f_i = component.intersection(f)
                 gx = g.subgraph(component)
-                component_mif_set = MaximumInducedForest.mif_preprocess_2(gx, f_i, active_v)
+                component_mif_set = self.preprocess_2(gx, f_i, active_v)
                 if component_mif_set:
                     mif_set = mif_set.union(component_mif_set)
             return mif_set
-        return MaximumInducedForest.mif_preprocess_2(g, f, active_v)
+        return self.preprocess_2(g, f, active_v)
 
-    @staticmethod
-    def mif_preprocess_2(g: MultiGraph, f: set, active_v) -> set:
+    def preprocess_2(self, g: MultiGraph, f: set, active_v) -> set:
         mif_set = set()
         while not is_independent_set(g, f):
             mif_set = mif_set.union(f)
-            for component in nxc.connected_components(g.subgraph(f)):
+            for component in connected_components(g.subgraph(f)):
                 if len(component) > 1:
                     if active_v in component:
                         active_v = component.pop()
                         compressed_node = active_v
                     else:
                         compressed_node = component.pop()
-                    g = MaximumInducedForest.compress(g, component, compressed_node, True)
+                    g = self.compress(g, component, compressed_node, True)
                     f = f.intersection(g.nodes())
                     # Maybe faster with
                     # f = f.difference(component)
                     # f.add(compressed_node)
                     mif_set = mif_set.union(component)
                     break
-        mif_set2 = MaximumInducedForest.mif_main(g, f, active_v)
+        mif_set2 = self.mif_main(g, f, active_v)
         if mif_set2:
             mif_set = mif_set2.union(mif_set)
 
         return mif_set
 
-    @staticmethod
-    def compress(g: MultiGraph, t: set, compressed_node, mutate=False) -> MultiGraph:
+    def compress(self, g: MultiGraph, t: set, compressed_node, mutate=False) -> MultiGraph:
         if not t:
             return g
         if mutate:
@@ -106,23 +105,21 @@ class MaximumInducedForest(FeedbackVertexSetAlgorithm):
 
         return gx
 
-    @staticmethod
-    def generalized_degree(g: MultiGraph, f: set, active_node, node) -> (int, set):
+    def generalized_degree(self, g: MultiGraph, f: set, active_node, node) -> (int, set):
         assert g.has_node(node), "Calculating gd for node which is not in g!"
 
         k = set(g.neighbors(node))
         k.remove(active_node)
         k = k.intersection(f)
 
-        gx = MaximumInducedForest.compress(g, k, node)
+        gx = self.compress(g, k, node)
 
         neighbors = gx.neighbors(node)
         neighbors.remove(active_node)
 
         return len(neighbors), neighbors
 
-    @staticmethod
-    def mif_main(g: MultiGraph, f: set, t) -> set:
+    def mif_main(self, g: MultiGraph, f: set, t) -> set:
         if f == g.nodes():
             return f
         if not f:
@@ -135,8 +132,8 @@ class MaximumInducedForest(FeedbackVertexSetAlgorithm):
                 fx.add(g_max_degree_node)
                 gx = g.copy()
                 gx.remove_node(g_max_degree_node)
-                mif_set1 = MaximumInducedForest.mif_preprocess_1(g, fx, t)
-                mif_set2 = MaximumInducedForest.mif_preprocess_1(gx, f, t)
+                mif_set1 = self.preprocess_1(g, fx, t)
+                mif_set2 = self.preprocess_1(gx, f, t)
                 if not mif_set1:
                     return mif_set2
                 elif not mif_set2:
@@ -151,10 +148,10 @@ class MaximumInducedForest(FeedbackVertexSetAlgorithm):
         gd_over_3 = None
         gd_2 = None
         for v in g.neighbors_iter(t):
-            (gd_v, gn_v) = MaximumInducedForest.generalized_degree(g, f, t, v)
+            (gd_v, gn_v) = self.generalized_degree(g, f, t, v)
             if gd_v <= 1:
                 f.add(v)
-                return MaximumInducedForest.mif_preprocess_1(g, f, t)
+                return self.preprocess_1(g, f, t)
             elif gd_v >= 3:
                 gd_over_3 = v
             else:
@@ -165,8 +162,8 @@ class MaximumInducedForest(FeedbackVertexSetAlgorithm):
             fx.add(gd_over_3)
             gx = g.copy()
             gx.remove_node(gd_over_3)
-            mif_set1 = MaximumInducedForest.mif_preprocess_1(g, fx, t)
-            mif_set2 = MaximumInducedForest.mif_preprocess_1(gx, f, t)
+            mif_set1 = self.preprocess_1(g, fx, t)
+            mif_set2 = self.preprocess_1(gx, f, t)
             if not mif_set1:
                 return mif_set2
             elif not mif_set2:
@@ -183,11 +180,11 @@ class MaximumInducedForest(FeedbackVertexSetAlgorithm):
             gx = g.copy()
             gx.remove_node(v)
             try:
-                cyc.find_cycle(gx.subgraph(fx2))
+                find_cycle(gx.subgraph(fx2))
                 mif_set1 = None
             except:
-                mif_set1 = MaximumInducedForest.mif_preprocess_1(gx, fx2, t)
-            mif_set2 = MaximumInducedForest.mif_preprocess_1(g, fx1, t)
+                mif_set1 = self.preprocess_1(gx, fx2, t)
+            mif_set2 = self.preprocess_1(g, fx1, t)
             if not mif_set1:
                 return mif_set2
             elif not mif_set2:
