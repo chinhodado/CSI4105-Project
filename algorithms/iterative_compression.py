@@ -9,7 +9,14 @@ from tools.utils import graph_minus
 
 class IterativeCompression(FeedbackVertexSetAlgorithm):
     """
-    Iterative compression from Parametrzed Algorithms 4.3.1
+    Iterative Compression algorithm for the undirected feedback vertex set problem from chapter 4.3.1 of Parameterized
+    Algorithms, Cygan, M., Fomin, F.V., Kowalik, Ł., Lokshtanov, D., Marx, D., Pilipczuk, M., Pilipczuk, M., Saurabh, S.
+
+    This algorithm will, given a feedback vertex set instance (G, k), in time (5^k)*(n^O(1)) either reports a failure
+    or finds a feedback vertex set in G of size at most k.
+
+    Originally designed for the decision version of the problem (via the get_fbvs_max_size() method), this algorithm
+    can also be used to solve the optimization version (via the get_fbvs() method).
     """
 
     def get_fbvs(self, graph: Graph):
