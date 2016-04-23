@@ -7,7 +7,7 @@ from tools.utils import *
 
 def fvs_via_mif(g: MultiGraph, k: int) -> set:
     mif = MaximumInducedForest()
-    result = mif.get_fbvs_max_size(g, k)
+    result = mif.get_fbvs(g)
     return result
 
 
