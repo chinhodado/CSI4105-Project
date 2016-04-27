@@ -1,7 +1,10 @@
 import itertools
-from networkx import Graph
+from typing import TypeVar
+
+from networkx import Graph, find_cycle, NetworkXNoCycle
 from networkx import MultiGraph
-from networkx.algorithms.tree import is_forest
+
+GT = TypeVar('GT', bound=Graph)
 
 
 def multigraph_to_graph(g: MultiGraph) -> Graph:
@@ -17,7 +20,7 @@ def graph_to_multigraph(g: Graph) -> MultiGraph:
     return gx
 
 
-def graph_minus(g: Graph, s: set) -> Graph:
+def graph_minus(g: GT, s: set) -> GT:
     new_nodes = [x for x in g.nodes() if x not in s]
     new_graph = g.subgraph(new_nodes)
     return new_graph
@@ -25,7 +28,7 @@ def graph_minus(g: Graph, s: set) -> Graph:
 
 def is_fvs(g: MultiGraph, w) -> bool:
     h = graph_minus(g, w)
-    return (len(h) == 0) or is_forest(h)
+    return (len(h) == 0) or is_acyclic(h)
 
 
 def is_independent_set(g: MultiGraph, f: set) -> bool:
@@ -35,7 +38,15 @@ def is_independent_set(g: MultiGraph, f: set) -> bool:
     return True
 
 
-def remove_node_deg_01(g: Graph) -> bool:
+def is_acyclic(g: Graph) -> bool:
+    try:
+        cycle = find_cycle(g)
+    except NetworkXNoCycle:
+        return True
+    return False
+
+
+def remove_node_deg_01(g: GT) -> bool:
     """
     Delete all nodes of degree 0 or 1 in a graph
     Return `True` if the graph was modified and `False` otherwise

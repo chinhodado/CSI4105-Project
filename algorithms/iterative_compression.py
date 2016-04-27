@@ -1,10 +1,9 @@
 import itertools
 
 from networkx import MultiGraph, Graph
-from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
-from tools.utils import graph_minus
+from tools.utils import graph_minus, is_acyclic
 
 
 class IterativeCompression(FeedbackVertexSetAlgorithm):
@@ -20,7 +19,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
     """
 
     def get_fbvs(self, graph: Graph):
-        if is_forest(graph):
+        if is_acyclic(graph):
             return set()
 
         if type(graph) is not MultiGraph:
@@ -74,7 +73,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
         """
 
         # If G[W] isn't a forest, then a solution X not using W can't remove W's cycles.
-        if not is_forest(g.subgraph(w)):
+        if not is_acyclic(g.subgraph(w)):
             return None
 
         # Apply reductions exhaustively.
@@ -154,7 +153,7 @@ class IterativeCompression(FeedbackVertexSetAlgorithm):
         """
         for v in h.nodes():
             # Check if G[W ∪ {v}] contains a cycle.
-            if not is_forest(g.subgraph(w.union({v}))):
+            if not is_acyclic(g.subgraph(w.union({v}))):
                 g.remove_node(v)
                 h.remove_nodes_from([v])
                 return k - 1, v, True

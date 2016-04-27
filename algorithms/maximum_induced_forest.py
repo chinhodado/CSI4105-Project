@@ -1,4 +1,4 @@
-from networkx import number_connected_components, connected_components, find_cycle
+from networkx import number_connected_components, connected_components
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
 from tools.utils import *
@@ -15,7 +15,7 @@ class MaximumInducedForest(FeedbackVertexSetAlgorithm):
     """
 
     def get_fbvs(self, graph: Graph):
-        if is_forest(graph):
+        if is_acyclic(graph):
             return set()
 
         # Save the original node set for later use since we'll mutate the graph

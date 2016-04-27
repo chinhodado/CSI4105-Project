@@ -2,10 +2,9 @@ from random import choice
 from typing import List
 
 from networkx import MultiGraph, Graph
-from networkx.algorithms.tree import is_forest
 
 from algorithms.feedback_vertex_set_algorithm import FeedbackVertexSetAlgorithm
-from tools.utils import graph_minus
+from tools.utils import graph_minus, is_acyclic
 
 
 class Randomized(FeedbackVertexSetAlgorithm):
@@ -23,7 +22,7 @@ class Randomized(FeedbackVertexSetAlgorithm):
     """
 
     def get_fbvs(self, graph: Graph):
-        if is_forest(graph):
+        if is_acyclic(graph):
             return set()
 
         if type(graph) is not MultiGraph:
