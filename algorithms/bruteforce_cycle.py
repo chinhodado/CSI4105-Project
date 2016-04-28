@@ -11,9 +11,6 @@ class BruteforceCycle(FeedbackVertexSetAlgorithm):
     A bruteforce algorithm to find the min size feedback vertex set
     This algorithm will find all nodes that belong to at least one cycle. For each of those nodes,
     it recursively run the algorithm on the induced subgraph with the node removed to find the min fbvs
-
-    WARNING: THERE IS NO GUARANTEE THAT THIS ALGORITHM IS CORRECT!!! E.G. THERE'S NO GUARANTEE THAT THE
-    RETURNED FBVS IS THE MINIMUM ONE!
     """
 
     def __init__(self):
